@@ -50,6 +50,9 @@ class MicrophoneStream:
 
         self._open = True
 
+        self.peak_levels = []
+        self.start_time = round(time.time() * 1000)
+
     def __iter__(self):
         """
         Returns the iterator object.
@@ -65,7 +68,16 @@ class MicrophoneStream:
             raise StopIteration
 
         try:
-            return self._stream.read(self._chunk_size)
+            # return self._stream.read(self._chunk_size)
+            
+            import numpy as np
+            
+            data = self._stream.read(self._chunk_size, exception_on_overflow=False)
+            audio_data = np.frombuffer(data, dtype=np.int16)
+            peak = np.max(np.abs(audio_data))
+            peak_normalized = round(peak / 32768.0 * 1000)
+            self.peak_levels.append((round(time.time() * 1000) - self.start_time, peak_normalized))
+            return data
         except KeyboardInterrupt:
             raise StopIteration
 
