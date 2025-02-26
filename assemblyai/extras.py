@@ -77,6 +77,9 @@ class MicrophoneStream:
             peak = np.max(np.abs(audio_data))
             peak_normalized = round(peak / 32768.0 * 1000)
             self.peak_levels.append((round(time.time() * 1000) - self.start_time, peak_normalized))
+
+            print("Peak Normalized:", peak_normalized)
+            
             return data
         except KeyboardInterrupt:
             raise StopIteration
